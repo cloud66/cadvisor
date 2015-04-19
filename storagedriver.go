@@ -20,6 +20,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloud66/cadvisor/storage/httprelay"
 	"github.com/golang/glog"
 	"github.com/google/cadvisor/manager"
 	"github.com/google/cadvisor/storage"
@@ -35,6 +36,7 @@ var argDbName = flag.String("storage_driver_db", "cadvisor", "database name")
 var argDbTable = flag.String("storage_driver_table", "stats", "table name")
 var argDbIsSecure = flag.Bool("storage_driver_secure", false, "use secure connection with database")
 var argDbBufferDuration = flag.Duration("storage_driver_buffer_duration", 60*time.Second, "Writes in the storage driver will be buffered for this duration, and committed to the non memory backends as a single transaction")
+var argHttpPath = flag.String("http_relay_path", "localhost", "http path")
 
 const statsRequestedByUI = 60
 
@@ -79,6 +81,18 @@ func NewMemoryStorage(backendStorageName string) (*memory.InMemoryStorage, error
 			hostname,
 			*argDbTable,
 			*argDbName,
+		)
+	case "httprelay":
+		var hostname string
+		hostname, err = os.Hostname()
+		if err != nil {
+			return nil, err
+		}
+		backendStorage, err = httprelay.New(
+			hostname,
+			*argHttpPath,
+		//	*argDbTable,
+		//	*argDbName,
 		)
 	default:
 		err = fmt.Errorf("unknown backend storage driver: %v", *argDbDriver)
