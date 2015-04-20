@@ -28,6 +28,7 @@ type httprelayStorage struct {
 	machineName string
 	httpPath    string
 	containerId string
+	tag         string
 }
 
 func (self *httprelayStorage) AddStats(ref info.ContainerReference, stats *info.ContainerStats) error {
@@ -53,6 +54,7 @@ func (self *httprelayStorage) AddStats(ref info.ContainerReference, stats *info.
 	payload := make(map[string]string)
 	payload["container_id"] = container_id
 	payload["data"] = string(stats_json)
+	payload["tag"] = self.tag
 
 	payload_json, _ := json.Marshal(payload)
 
@@ -84,12 +86,14 @@ func (self *httprelayStorage) Close() error {
 // httpPath: httpPath that we must relay data to.
 func New(machineName,
 	httpPath,
-	containerId string,
+	containerId,
+	tag string,
 ) (storage.StorageDriver, error) {
 	ret := &httprelayStorage{
 		machineName: machineName,
 		httpPath:    httpPath,
 		containerId: containerId,
+		tag:         tag,
 	}
 	return ret, nil
 }

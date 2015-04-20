@@ -38,6 +38,7 @@ var argDbIsSecure = flag.Bool("storage_driver_secure", false, "use secure connec
 var argDbBufferDuration = flag.Duration("storage_driver_buffer_duration", 60*time.Second, "Writes in the storage driver will be buffered for this duration, and committed to the non memory backends as a single transaction")
 var argHttpPath = flag.String("http_relay_path", "localhost", "http path")
 var argHttpContainerId = flag.String("http_relay_container_id", "", "specific container its stat would be relayed")
+var argHttpTag = flag.String("http_relay_tag", "", "tag for relay data")
 
 const statsRequestedByUI = 60
 
@@ -93,6 +94,7 @@ func NewMemoryStorage(backendStorageName string) (*memory.InMemoryStorage, error
 			hostname,
 			*argHttpPath,
 			*argHttpContainerId,
+			*argHttpTag,
 		)
 	default:
 		err = fmt.Errorf("unknown backend storage driver: %v", *argDbDriver)
