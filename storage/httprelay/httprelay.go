@@ -31,6 +31,12 @@ type httprelayStorage struct {
 	tag         string
 }
 
+type dataPayload struct {
+	ContainerId string              `json:"container_id"`
+	Data        info.ContainerStats `json:"data"`
+	Tag         string              `json:"tag"`
+}
+
 func (self *httprelayStorage) AddStats(ref info.ContainerReference, stats *info.ContainerStats) error {
 	if stats == nil {
 		return nil
@@ -49,12 +55,10 @@ func (self *httprelayStorage) AddStats(ref info.ContainerReference, stats *info.
 		return nil
 	}
 
-	stats_json, _ := json.Marshal(stats)
-
-	payload := make(map[string]string)
-	payload["container_id"] = container_id
-	payload["data"] = string(stats_json)
-	payload["tag"] = self.tag
+	var payload dataPayload
+	payload.ContainerId = container_id
+	payload.Data = *stats
+	payload.Tag = self.tag
 
 	payload_json, _ := json.Marshal(payload)
 
